@@ -1,4 +1,6 @@
 from main import buildGraph
+import time
+import tracemalloc  
 
 # build the travel graph
 travel = buildGraph()
@@ -16,19 +18,6 @@ for src, dst, cost, time, mode in cheapestPath:
 print(f"\nFastest path time: {bestTime} min")
 for src, dst, cost, time, mode in fastestPath:
     print(f" {src} -> {dst}: {mode}, ${cost:.2f}, {time} min")\
-
-#test case 2: los angeles to sacramento 
-bestCost, cheapestPath = travel.dijkstra("Los Angeles", "Sacramento", weight="cost")
-bestTime, fastestPath = travel.dijkstra("Los Angeles", "Sacramento", weight="time")
-
-print(f"\nCheapest path cost: ${bestCost:.2f}")
-for src, dst, cost, time, mode in cheapestPath:
-    print(f" {src} -> {dst}: {mode}, ${cost:.2f}, {time} min")
-
-print(f"\nFastest path time: {bestTime} min")
-for src, dst, cost, time, mode in fastestPath:
-    print(f" {src} -> {dst}: {mode}, ${cost:.2f}, {time} min")
-
 
 
 #test case 2: los angeles to sacramento 
@@ -62,3 +51,22 @@ for src, dst, cost, time, mode in fastestPath3:
 #brute force testing to compare if it matches dijkstra
 bfCost = travel.bruteForce("Oakland", "San Diego", weight="cost")
 print(f"\nBrute-Force: ${bfCost: .2f}")
+import time
+import tracemalloc
+
+# measure over 10,000 runs for accuracy
+tracemalloc.start()
+start_t = time.perf_counter()
+
+for i in range(10000):
+    travel.dijkstra("San Diego", "San Jose", weight="cost")
+    travel.dijkstra("Oakland", "San Diego", weight="time")
+
+elapsed = time.perf_counter() - start_t
+i, peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+avgMs = (elapsed / 20000) * 1000
+print(f"\nRuntime & Memory:")
+print(f"avg runtime per call: {avgMs:.4f} ms")
+print(f"peak memory: {peak / 1024:.2f} KB")
